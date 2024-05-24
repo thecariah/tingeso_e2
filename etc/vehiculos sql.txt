@@ -1,0 +1,13 @@
+INSERT INTO
+    vehiculos (patente, marca, modelo, tipo, fabricacion, motor, asientos)
+VALUES
+    ('AB12', 'Toyota', 'Corolla', 'sedan', 2020, 'gasolina', 5),
+    ('CD34', 'Volkswagen', 'Golf', 'hatchback', 2019, 'diesel', 5),
+    ('EF56', 'Ford', 'Explorer', 'suv', 2021, 'hibrido', 7),
+    ('GH78', 'Chevrolet', 'Silverado', 'pickup', 2018, 'gasolina', 5),
+    ('IJ90', 'Renault', 'Kangoo', 'furgoneta', 2017, 'diesel', 3),
+    ('KL12', 'Hyundai', 'Elantra', 'sedan', 2022, 'hibrido', 5),
+    ('MN34', 'Honda', 'Civic', 'sedan', 2019, 'gasolina', 5),
+    ('OP56', 'Tesla', 'Model S', 'sedan', 2020, 'electrico', 5),
+    ('QR78', 'Nissan', 'Leaf', 'hatchback', 2021, 'electrico', 5),
+    ('WX78', 'Chevrolet', 'Trax', 'suv', 2022, 'diesel', 5);
