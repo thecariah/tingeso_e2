@@ -34,21 +34,23 @@ public class HistorialController {
 
     @PostMapping("/new")
     public String createReparacionEnHistorial(@RequestParam("fecha_ingreso") String fecha_ingreso,
-                                   @RequestParam("hora_ingreso") String hora_ingreso,
-                                   @RequestParam("monto_reparaciones") int monto_reparaciones,
-                                  @RequestParam("monto_recargos") int monto_recargos,
-                                  @RequestParam("monto_descuentos") int monto_descuentos,
-                                  @RequestParam("monto_iva") int monto_iva,
-                                   @RequestParam("costo_total") int costo_total,
-                                   @RequestParam("fecha_salida") String fecha_salida,
-                                   @RequestParam("hora_salida") String hora_salida,
-                                   @RequestParam("fecha_retiro") String fecha_retiro,
-                                   @RequestParam("hora_retiro") String hora_retiro,
-                                   @RequestParam("patente") String patente){
+                                              @RequestParam("hora_ingreso") String hora_ingreso,
+                                              @RequestParam("monto_reparaciones") int monto_reparaciones,
+                                              @RequestParam("monto_recargos") int monto_recargos,
+                                              @RequestParam("monto_descuentos") int monto_descuentos,
+                                              @RequestParam("monto_iva") int monto_iva,
+                                              @RequestParam("costo_total") int costo_total,
+                                              @RequestParam("fecha_salida") String fecha_salida,
+                                              @RequestParam("hora_salida") String hora_salida,
+                                              @RequestParam("fecha_retiro") String fecha_retiro,
+                                              @RequestParam("hora_retiro") String hora_retiro,
+                                              @RequestParam("patente") String patente,
+                                              @RequestParam("bono") int bono,
+                                              @RequestParam("kilometraje") int kilometraje){
 
         historialService.guardarEnHistorial(fecha_ingreso, hora_ingreso, monto_reparaciones, monto_recargos,
                 monto_descuentos, monto_iva, costo_total, fecha_salida, hora_salida, fecha_retiro,
-                hora_retiro, patente);
+                hora_retiro, patente, bono, kilometraje);
 
         return "redirect:/reparaciones/new";
     }

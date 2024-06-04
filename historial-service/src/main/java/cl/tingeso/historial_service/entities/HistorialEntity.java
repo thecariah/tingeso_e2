@@ -28,4 +28,6 @@ public class HistorialEntity {
     private String fecha_retiro;    // cuando el cliente retira el vehiculo
     private String hora_retiro;
     private String patente;         // 4 letras + 2 numeros.
+    private int bono;
+    private int kilometraje;
 }
