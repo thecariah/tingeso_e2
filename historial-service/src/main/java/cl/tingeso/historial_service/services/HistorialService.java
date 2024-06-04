@@ -4,6 +4,7 @@ import cl.tingeso.historial_service.entities.HistorialEntity;
 import cl.tingeso.historial_service.models.ReparacionModel;
 import cl.tingeso.historial_service.models.VehiculoModel;
 import cl.tingeso.historial_service.repositories.HistorialRepository;
+import com.ctc.wstx.shaded.msv_core.grammar.dtd.LocalNameClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -26,15 +27,9 @@ public class HistorialService {
     @Autowired
     RestTemplate restTemplate;
 
-
     public VehiculoModel obtenerVehiculoPorPatente(String patente){
         VehiculoModel vehiculo = restTemplate.getForObject("http://vehiculo-service/vehiculos/" + patente, VehiculoModel.class);
         return vehiculo;
-    }
-
-    public List<ReparacionModel> obtenerTodasLasReparaciones(){
-        List<ReparacionModel> reparaciones = restTemplate.getForObject("http://reparacion-service/reparaciones/all", List.class);
-        return reparaciones;
     }
 
     public List<ReparacionModel> obtenerReparacionesDeVehiculo(String patente){
@@ -53,27 +48,35 @@ public class HistorialService {
         return LocalDate.parse(fecha, formato);
     }
 
-    public List<ReparacionModel> reparacionesVehiculo12Meses(List<ReparacionModel> reparacionesVehiculo) {
-        LocalDate fechaActual = LocalDate.now();
-        LocalDate hace12Meses = fechaActual.minus(12, ChronoUnit.MONTHS);
-        List<ReparacionModel> reparacionesVehiculo12Meses = new ArrayList<>();
+    public List<ReparacionModel> filtrarReparacionesPorFecha(List<ReparacionModel> reparaciones, String fechaInicio, String fechaFinal){
+        List<ReparacionModel> reparacionesFiltradas = new ArrayList<>();
+        LocalDate fechaIn = convertirStringAFecha(fechaInicio);
+        LocalDate fechaFin = convertirStringAFecha(fechaFinal);
 
-        for (int i = 0; i < reparacionesVehiculo.size(); i++){
-            ReparacionModel reparacion = reparacionesVehiculo.get(i);
-            LocalDate fecha = convertirStringAFecha(reparacion.getFecha());
+        for (int i = 0; i < reparaciones.size(); i++){
+            ReparacionModel reparacion = reparaciones.get(i);
+            LocalDate fechaRep = convertirStringAFecha(reparacion.getFecha());
 
-            if ((fecha.isAfter(hace12Meses) || fecha.isEqual(hace12Meses)) && fecha.isBefore(fechaActual)){
-                reparacionesVehiculo12Meses.add(reparacion);
+            if ((fechaRep.isAfter(fechaIn) || fechaRep.isEqual(fechaIn)) && (fechaRep.isBefore(fechaFin) || fechaRep.isEqual(fechaFin))){
+                reparacionesFiltradas.add(reparacion);
             }
         }
 
-        return reparacionesVehiculo12Meses;
+        return reparacionesFiltradas;
     }
 
     // Objetivo: Calcular el porcentaje de descuento segun el numero de reparaciones de los ultimos 12 meses.
     public int descuentoNumeroReparaciones(String patente){
         List<ReparacionModel> reparacionesVehiculo = obtenerReparacionesDeVehiculo(patente);
-        int numRepar = reparacionesVehiculo12Meses(reparacionesVehiculo).size();
+
+        LocalDate fechaActual = LocalDate.now();
+        LocalDate fechaHace12Meses = fechaActual.minus(12, ChronoUnit.MONTHS);
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<ReparacionModel> reparacionesVehiculo12Meses = filtrarReparacionesPorFecha(reparacionesVehiculo,
+                fechaHace12Meses.format(formato), fechaActual.format(formato));
+
+        int numRepar = reparacionesVehiculo12Meses.size();
 
         VehiculoModel vehiculo = obtenerVehiculoPorPatente(patente);
         String motor = vehiculo.getMotor();
@@ -244,20 +247,22 @@ public class HistorialService {
         return porcentajeRecargo;
     }
 
-    public void guardarEnHistorial(String fecha_ingreso, String hora_ingreso, int monto_reparaciones,
-                                   int monto_recargos, int monto_descuentos, int monto_iva, int costo_total,
-                                   String fecha_salida, String hora_salida, String fecha_retiro,
-                                   String hora_retiro, String patente, int bono, int kilometraje){
+    public int calcularValor(int montoTotal, int porcentaje){
+        // 100% = montoTotal
+        // porcentaje% = X
+
+        return ((montoTotal * porcentaje) / 100);
+    }
+
+    public void guardarEnHistorial(String fecha_ingreso, String hora_ingreso,
+                                   String fecha_salida, String hora_salida,
+                                   String fecha_retiro, String hora_retiro,
+                                   String patente, int bono, int kilometraje){
 
         HistorialEntity historial_rep = new HistorialEntity();
 
         historial_rep.setFecha_ingreso(fecha_ingreso);
         historial_rep.setHora_ingreso(hora_ingreso);
-        historial_rep.setMonto_reparaciones(monto_reparaciones);
-        historial_rep.setMonto_recargos(monto_recargos);
-        historial_rep.setMonto_descuentos(monto_descuentos);
-        historial_rep.setMonto_iva(monto_iva);
-        historial_rep.setCosto_total(costo_total);
         historial_rep.setFecha_salida(fecha_salida);
         historial_rep.setHora_salida(hora_salida);
         historial_rep.setFecha_retiro(fecha_retiro);
@@ -265,6 +270,40 @@ public class HistorialService {
         historial_rep.setPatente(patente);
         historial_rep.setBono(bono);
         historial_rep.setKilometraje(kilometraje);
+
+        List<ReparacionModel> reparacionesVehiculo = obtenerReparacionesDeVehiculo(patente);
+        List<ReparacionModel> reparacionesRealizadas = filtrarReparacionesPorFecha(reparacionesVehiculo, fecha_ingreso, fecha_salida);
+
+        // MONTO REPARACIONES
+        int monto_reparaciones = 0;
+
+        for (int i = 0; i < reparacionesRealizadas.size(); i++){
+            monto_reparaciones = monto_reparaciones + reparacionesRealizadas.get(i).getMonto();
+        }
+
+        historial_rep.setMonto_reparaciones(monto_reparaciones);
+
+        // MONTO RECARGOS
+        int monto_recargos = calcularValor(monto_reparaciones, recargoPorKilometraje(patente, kilometraje)) +
+                calcularValor(monto_reparaciones, recargoPorAntiguedad(patente)) +
+                calcularValor(monto_reparaciones, recargoPorRetrasoRecogida(fecha_salida, fecha_retiro));
+
+        historial_rep.setMonto_recargos(monto_recargos);
+
+        // MONTO DESCUENTOS
+        int monto_descuentos = calcularValor(monto_reparaciones, descuentoNumeroReparaciones(patente)) +
+                calcularValor(monto_reparaciones, descuentoDiaAtencion(fecha_ingreso, hora_ingreso)) + bono;
+
+        historial_rep.setMonto_descuentos(monto_descuentos);
+
+        // MONTO IVA
+        int monto_iva = calcularValor(monto_reparaciones, 19);
+        historial_rep.setMonto_iva(monto_iva);
+
+        // COSTO TOTAL
+        int costo_total = (monto_reparaciones + monto_recargos - monto_descuentos) + monto_iva;
+        historial_rep.setCosto_total(costo_total);
+
         historialRepository.save(historial_rep);
     }
 
