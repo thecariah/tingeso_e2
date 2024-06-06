@@ -1,4 +1,4 @@
-package cl.tingeso.historial_service;
+package cl.tingeso.gateway_server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,10 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
 @EnableEurekaClient
-public class HistorialServiceApplication {
+public class GatewayServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HistorialServiceApplication.class, args);
+		SpringApplication.run(GatewayServerApplication.class, args);
 	}
 
 }
