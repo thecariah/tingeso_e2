@@ -1,0 +1,16 @@
+# Crear dump de una base de datos
+pg_dump -U postgres -h localhost -d nombre_base_datos -f dump.sql
+
+pg_dump -U postgres -h localhost -d vehiculos-db -f vehiculos-db.sql
+pg_dump -U postgres -h localhost -d reparaciones-db -f reparaciones-db.sql
+pg_dump -U postgres -h localhost -d historial-db -f historial-db.sql
+
+# Crear base de datos donde importaremos el dump
+createdb -U postgres -h localhost nombre_base_datos
+psql -U postgres -h localhost -d nombre_base_datos -f dump.sql
+
+# Eliminar base de datos
+dropdb -U postgres -h localhost nombre_base_datos
+
+# Mostrar base de datos
+psql -U postgres -h localhost -l
