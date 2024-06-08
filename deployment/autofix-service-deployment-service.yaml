@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autofix-service-deployment
+  labels:
+    app: autofix-service-deployment
+spec:
+  selector:
+    matchLabels:
+      app: autofix-service-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: autofix-service-deployment
+    spec:
+      containers:
+        - name: autofix-service
+          image: thecariah/autofix-service
+          ports:
+            - containerPort: 8094
