@@ -19,3 +19,6 @@ spec:
           image: thecariah/autofix-service
           ports:
             - containerPort: 8094
+          env:
+            - name: SERVER_PORT
+              value: "0"
