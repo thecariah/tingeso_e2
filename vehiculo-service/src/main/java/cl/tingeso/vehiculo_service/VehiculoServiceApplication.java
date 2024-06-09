@@ -8,8 +8,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication(exclude={DataSourceAutoConfiguration.class},
 		scanBasePackages={"cl.tingeso.vehiculo_service.repositories"})
-@EnableDiscoveryClient
-//@EnableEurekaClient
+@EnableEurekaClient
 public class VehiculoServiceApplication {
 
 	public static void main(String[] args) {
