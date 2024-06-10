@@ -23,27 +23,27 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
-        - id: vehiculo-service
-          uri: lb://vehiculo-service
+        - id: VEHICULO-SERVICE
+          uri: lb://VEHICULO-SERVICE
           predicates:
             - Path=/vehiculos/**
           filters:
-            - RewritePath=/vehiculos/(?<segment>.*), /$\{segment}
-        - id: reparacion-service
-          uri: lb://reparacion-service
+            - StripPrefix=1
+        - id: REPARACION-SERVICE
+          uri: lb://REPARACION-SERVICE
           predicates:
             - Path=/reparaciones/**
           filters:
-            - RewritePath=/reparaciones/(?<segment>.*), /$\{segment}
-        - id: historial-service
-          uri: lb://historial-service
+            - StripPrefix=1
+        - id: HISTORIAL-SERVICE
+          uri: lb://HISTORIAL-SERVICE
           predicates:
             - Path=/historial/**
           filters:
-            - RewritePath=/historial/(?<segment>.*), /$\{segment}
-        - id: autofix-service
-          uri: lb://autofix-service
+            - StripPrefix=1
+        - id: AUTOFIX-SERVICE
+          uri: lb://AUTOFIX-SERVICE
           predicates:
             - Path=/reportes/**
           filters:
-            - RewritePath=/reportes/(?<segment>.*), /$\{segment}
+            - StripPrefix=1
