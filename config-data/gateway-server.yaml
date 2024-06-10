@@ -39,3 +39,13 @@ spring:
           uri: lb://autofix-service
           predicates:
             - Path=/reportes/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'gateway,*'
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
