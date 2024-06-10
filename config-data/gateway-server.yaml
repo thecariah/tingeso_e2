@@ -27,15 +27,23 @@ spring:
           uri: lb://vehiculo-service
           predicates:
             - Path=/vehiculos/**
+          filters:
+            - RewritePath=/vehiculos/(?<segment>.*), /$\{segment}
         - id: reparacion-service
           uri: lb://reparacion-service
           predicates:
             - Path=/reparaciones/**
+          filters:
+            - RewritePath=/reparaciones/(?<segment>.*), /$\{segment}
         - id: historial-service
           uri: lb://historial-service
           predicates:
             - Path=/historial/**
+          filters:
+            - RewritePath=/historial/(?<segment>.*), /$\{segment}
         - id: autofix-service
           uri: lb://autofix-service
           predicates:
             - Path=/reportes/**
+          filters:
+            - RewritePath=/reportes/(?<segment>.*), /$\{segment}
